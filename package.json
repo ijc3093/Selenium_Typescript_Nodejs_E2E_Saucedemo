@@ -1,0 +1,22 @@
+{
+  "name": "selenium_typescript_nodejs_e2e_saucedemo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ijc3093/Selenium_Typescript_Nodejs_E2E_Saucedemo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ijc3093/Selenium_Typescript_Nodejs_E2E_Saucedemo/issues"
+  },
+  "homepage": "https://github.com/ijc3093/Selenium_Typescript_Nodejs_E2E_Saucedemo#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.1"
+  }
+}
