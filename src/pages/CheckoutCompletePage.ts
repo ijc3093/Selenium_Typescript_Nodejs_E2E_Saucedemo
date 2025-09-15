@@ -1,19 +1,19 @@
-// src/pages/CheckoutCompletePage.ts
+import { By, ThenableWebDriver } from "selenium-webdriver";
+import BasePage from "./BasePage";
 
-import { Page, Locator } from '@playwright/test';
+export default class CheckoutCompletePage extends BasePage {
+  private header = By.css(".complete-header");
+  private thankYouMsg = By.css(".complete-text");
 
-export class CheckoutCompletePage {
-    private readonly page: Page;
-    private readonly selectors = {
-        header: '[data-test="checkout-complete-container"] h2',
-        thankYouMessage: '[data-test="complete-header"]'
-    };
+  constructor(driver: ThenableWebDriver) {
+    super(driver);
+  }
 
-    constructor(page: Page) {
-        this.page = page;
-    }
-    
-    public getThankYouMessage(): Locator {
-        return this.page.locator(this.selectors.thankYouMessage);
-    }
+  async waitForCompletion() {
+    await this.waitUntilVisible(this.header);
+  }
+
+  async getHeaderText() {
+    return (await this.find(this.header)).getText();
+  }
 }

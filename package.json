@@ -1,22 +1,29 @@
 {
-  "name": "selenium_typescript_nodejs_e2e_saucedemo",
+  "name": "selenium_typescript_nodejs_e2e_sauce_demo",
   "version": "1.0.0",
-  "description": "",
+  "description": "Selenium TypeScript E2E tests for saucedemo.com",
   "main": "index.js",
-  "scripts": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ijc3093/Selenium_Typescript_Nodejs_E2E_Saucedemo.git"
+  "scripts": {
+    "test": "mocha -r ts-node/register src/tests/**/*.spec.ts --timeout 60000",
+    "test:debug": "mocha -r ts-node/register src/tests/**/*.spec.ts --timeout 0 --inspect-brk",
+    "build": "tsc -p ."
   },
   "keywords": [],
-  "author": "",
+  "author": "Ike Chukz",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ijc3093/Selenium_Typescript_Nodejs_E2E_Saucedemo/issues"
-  },
-  "homepage": "https://github.com/ijc3093/Selenium_Typescript_Nodejs_E2E_Saucedemo#readme",
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
-    "@types/node": "^24.3.1"
+    "@types/chai": "^5.2.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.3.1",
+    "@types/selenium-webdriver": "^4.1.28",
+    "chai": "^6.0.1",
+    "mocha": "^11.7.2",
+    "selenium-webdriver": "^4.35.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "chromedriver": "^140.0.1",
+    "geckodriver": "^6.0.1"
   }
 }

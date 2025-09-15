@@ -1,36 +1,37 @@
-// src/pages/LoginPage.ts
+import { ThenableWebDriver, By, until } from "selenium-webdriver";
+import BasePage from "./BasePage";
 
-import { Page, Locator } from '@playwright/test';
+export default class LoginPage extends BasePage {
+  private username = By.css("[data-test='username']");
+  private password = By.css("[data-test='password']");
+  private loginButton = By.css("[data-test='login-button']");
+  private errorContainer = By.css("[data-test='error']");
 
-export class LoginPage {
-    private readonly page: Page;
-    private readonly selectors = {
-        usernameInput: '[data-test="username"]',
-        passwordInput: '[data-test="password"]',
-        loginButton: '[data-test="login-button"]',
-        errorMessage: '[data-test="error"]',
-    };
+  constructor(driver: ThenableWebDriver) {
+    super(driver);
+  }
 
-    constructor(page: Page) {
-        this.page = page;
+  async open() {
+    await super.open("");
+    await this.waitUntilVisible(this.username);
+  }
+
+  async login(user: string, pass: string) {
+    const u = await this.find(this.username);
+    const p = await this.find(this.password);
+    await u.clear();
+    await u.sendKeys(user);
+    await p.clear();
+    await p.sendKeys(pass);
+    await (await this.find(this.loginButton)).click();
+  }
+
+  async getErrorText() {
+    try {
+      const el = await this.driver.wait(until.elementLocated(this.errorContainer), 3000);
+      return el.getText();
+    } catch {
+      return "";
     }
-
-    public async navigateToLoginPage(): Promise<void> {
-        await this.page.goto('https://www.saucedemo.com/');
-    }
-
-    public async login(username: string, password: string): Promise<void> {
-        await this.page.locator(this.selectors.usernameInput).fill(username);
-        await this.page.locator(this.selectors.passwordInput).fill(password);
-        await this.page.locator(this.selectors.loginButton).click();
-    }
-
-    public async getErrorMessage(): Promise<string | null> {
-        const errorElement = this.page.locator(this.selectors.errorMessage);
-        return await errorElement.textContent();
-    }
-
-    public getErrorMessageLocator(): Locator {
-        return this.page.locator(this.selectors.errorMessage);
-    }
+  }
 }

@@ -1,33 +1,69 @@
-// src/pages/InventoryPage.ts (Refactored)
+import { By, ThenableWebDriver, until, WebElement } from "selenium-webdriver";
+import BasePage from "./BasePage";
 
-import { Page, Locator } from '@playwright/test';
-import { WaitHelpers } from '../utils/waitHelpers'; // Import the new helper
+export default class InventoryPage extends BasePage {
+  private inventoryContainer = By.css(".inventory_container");
+  private productItems = By.css(".inventory_item");
+  private sortSelect = By.css(".product_sort_container");
+  private cartBadge = By.css(".shopping_cart_badge");
+  private cartLink = By.css(".shopping_cart_link");
 
-export class InventoryPage {
-    private readonly page: Page;
-    private readonly selectors = {
-        inventoryContainer: '[data-test="inventory-container"]',
-        shoppingCartBadge: '[data-test="shopping-cart-badge"]',
-        // ... other selectors
-    };
+  constructor(driver: ThenableWebDriver) {
+    super(driver);
+  }
 
-    constructor(page: Page) {
-        this.page = page;
+  async waitForLoad() {
+    await this.waitUntilVisible(this.inventoryContainer);
+  }
+
+  async getProductElements(): Promise<WebElement[]> {
+    await this.waitFor(async () => (await this.findAll(this.productItems)).length > 0, 5000);
+    return await this.findAll(this.productItems);
+  }
+
+  async getPrices(): Promise<number[]> {
+    const items = await this.getProductElements();
+    const prices: number[] = [];
+    for (const item of items) {
+      const priceEl = await item.findElement(By.css(".inventory_item_price"));
+      const text = await priceEl.getText(); // e.g. "$29.99"
+      prices.push(parseFloat(text.replace(/\$/g, "")));
     }
+    return prices;
+  }
 
-    public async waitForPageToLoad(): Promise<void> {
-        // Now using our centralized helper for a clear, explicit wait.
-        await WaitHelpers.waitForElementToBeVisible(this.page.locator(this.selectors.inventoryContainer));
-    }
+  async sortBy(text: string) {
+    const select = await this.find(this.sortSelect);
+    await select.sendKeys(text); // using visible text: "Price (low to high)" or "Price (high to low)"
+    await this.waitForLoad();
+  }
 
-    public async addToCart(productName: string): Promise<void> {
-        const addToCartButton = this.page.locator(this.selectors.addToCartButton(productName));
-        // The click() method in Playwright already has an implicit wait,
-        // but for scenarios with extreme lag (like performance_glitch_user),
-        // explicitly waiting for the element to be enabled is a good practice.
-        await WaitHelpers.waitForElementToBeVisible(addToCartButton);
-        await addToCartButton.click();
+  async addToCartByName(productDataTest: string) {
+    // productDataTest example: "add-to-cart-sauce-labs-backpack"
+    const btn = await this.find(By.css(`[data-test='${productDataTest}']`));
+    await this.driver.wait(until.elementIsVisible(btn), 5000);
+    await btn.click();
+    // wait until badge appears or increments (tolerant)
+    try {
+      await this.driver.wait(async () => {
+        const badges = await this.findAll(this.cartBadge);
+        return badges.length > 0;
+      }, 3000);
+    } catch {}
+  }
+
+  async openCart() {
+    await (await this.find(this.cartLink)).click();
+  }
+
+  async getProductImageSrcs(): Promise<string[]> {
+    const items = await this.getProductElements();
+    const srcs: string[] = [];
+    for (const item of items) {
+      const img = await item.findElement(By.css(".inventory_item_img img"));
+      const src = await img.getAttribute("src");
+      srcs.push(src);
     }
-    
-    // ... rest of the methods
+    return srcs;
+  }
 }
